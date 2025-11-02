@@ -1,0 +1,139 @@
+import java.util.*;
+import java.util.stream.*;
+import java.util.function.*;
+import java.util.Comparator;
+import java.util.Map;
+import java.util.Optional;
+
+class Employee {
+    String name;
+    int age;
+    double salary;
+    Employee(String name, int age, double salary) {
+        this.name = name;
+        this.age = age;
+        this.salary = salary;
+    }
+    public String toString() {
+        return name + " | Age: " + age + " | Salary: " + salary;
+    }
+}
+
+class Student {
+    String name;
+    double marks;
+    Student(String name, double marks) {
+        this.name = name;
+        this.marks = marks;
+    }
+    public String toString() {
+        return name + " | Marks: " + marks;
+    }
+}
+
+class Product {
+    String name;
+    double price;
+    String category;
+    Product(String name, double price, String category) {
+        this.name = name;
+        this.price = price;
+        this.category = category;
+    }
+    public String toString() {
+        return name + " | " + category + " | " + price;
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        int choice;
+        do {
+            System.out.println("\n===== Experiment 2.3 Menu =====");
+            System.out.println("1. Part A - Sort Employees Using Lambda");
+            System.out.println("2. Part B - Filter and Sort Students Using Streams");
+            System.out.println("3. Part C - Stream Operations on Products");
+            System.out.println("4. Exit");
+            System.out.print("Enter your choice: ");
+            choice = sc.nextInt();
+            sc.nextLine();
+            switch (choice) {
+                case 1:
+                    partA();
+                    break;
+                case 2:
+                    partB();
+                    break;
+                case 3:
+                    partC();
+                    break;
+                case 4:
+                    System.out.println("Exiting...");
+                    break;
+                default:
+                    System.out.println("Invalid choice. Try again!");
+            }
+        } while (choice != 4);
+        sc.close();
+    }
+
+    static void partA() {
+        List<Employee> employees = Arrays.asList(
+            new Employee("Ravi", 25, 50000),
+            new Employee("Anita", 30, 70000),
+            new Employee("Karan", 22, 45000),
+            new Employee("Meena", 28, 60000)
+        );
+
+        System.out.println("\nSort by Name:");
+        employees.stream().sorted((e1, e2) -> e1.name.compareTo(e2.name)).forEach(System.out::println);
+
+        System.out.println("\nSort by Age:");
+        employees.stream().sorted(Comparator.comparingInt(e -> e.age)).forEach(System.out::println);
+
+        System.out.println("\nSort by Salary (Descending):");
+        employees.stream().sorted((e1, e2) -> Double.compare(e2.salary, e1.salary)).forEach(System.out::println);
+    }
+
+    static void partB() {
+        List<Student> students = Arrays.asList(
+            new Student("Riya", 80),
+            new Student("Arjun", 60),
+            new Student("Kavya", 90),
+            new Student("Manish", 76)
+        );
+
+        System.out.println("\nStudents with marks > 75, sorted by marks:");
+        students.stream()
+                .filter(s -> s.marks > 75)
+                .sorted(Comparator.comparingDouble(s -> s.marks))
+                .map(s -> s.name)
+                .forEach(System.out::println);
+    }
+
+    static void partC() {
+        List<Product> products = Arrays.asList(
+            new Product("Laptop", 55000, "Electronics"),
+            new Product("Mouse", 1200, "Electronics"),
+            new Product("Shirt", 1500, "Clothing"),
+            new Product("Jeans", 2500, "Clothing"),
+            new Product("Fruits", 500, "Grocery"),
+            new Product("Rice", 1200, "Grocery")
+        );
+
+        System.out.println("\nProducts grouped by category:");
+        Map<String, List<Product>> grouped = products.stream().collect(Collectors.groupingBy(p -> p.category));
+        grouped.forEach((cat, list) -> {
+            System.out.println(cat + ": " + list);
+        });
+
+        System.out.println("\nMost expensive product in each category:");
+        Map<String, Optional<Product>> expensive = products.stream()
+                .collect(Collectors.groupingBy(p -> p.category, Collectors.maxBy(Comparator.comparingDouble(p -> p.price))));
+        expensive.forEach((cat, prod) -> System.out.println(cat + ": " + prod.get()));
+
+        double avgPrice = products.stream().collect(Collectors.averagingDouble(p -> p.price));
+        System.out.println("\nAverage Price of All Products: " + avgPrice);
+    }
+}
